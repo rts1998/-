@@ -108,7 +108,7 @@ select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_
 {	
 	int i,j,k;
 	int temp;
-	int idx=0;
+	int ix=0;
 	select_result * a=NULL;
 	a = (select_result *)malloc(4001*sizeof(select_result));
 	for(i=0;i<100;i++) 
@@ -118,21 +118,21 @@ select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_
 					for(k=0;k<1000;k++)
 						if(item[k].l_orderkey==ord[j].o_orderkey && strcmp(item[k].l_shipdate,ship_date)>0)
 						{
-							a[idx].l_orderkey=item[k].l_orderkey;
-							a[idx].l_extendedprice=item[k].l_extendedprice;
-							strcpy(a[idx].o_orderdate, ord[j].o_orderdate);
+							a[ix].l_orderkey=item[k].l_orderkey;
+							a[ix].l_extendedprice=item[k].l_extendedprice;
+							strcpy(a[ix].o_orderdate, ord[j].o_orderdate);
 							idx++;
 						}
-	idx--;
-	for(i=0;i<idx;i++)
-		for(j=0;j<idx+1;j++)
+	ix--;
+	for(i=0;i<ix;i++)
+		for(j=0;j<ix+1;j++)
 			if(a[i].l_orderkey==a[j].l_orderkey)
 			{
 				a[i].l_extendedprice=a[i].l_extendedprice+a[j].l_extendedprice;
 				a[j].l_extendedprice=0;
 			}
-	for(i=0;i<idx-1;i++)
-		for(j=i;j<idx;j++)
+	for(i=0;i<ix-1;i++)
+		for(j=i;j<ix;j++)
 			if(a[j].l_extendedprice>a[i].l_extendedprice)
 			{
 				temp=a[i].l_extendedprice;
