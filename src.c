@@ -5,33 +5,33 @@
 
 typedef struct
 {
-	int c_custkey;    	   //¹Ë¿Í±àºÅ
-	char c_mkgsegment[20]; //¶ÔÓ¦µÄÄ³¸öÊĞ³¡²¿ÃÅ
-}customer;				   //¹Ë¿Í½á¹¹Ìå 
+	int c_custkey;    	   //é¡¾å®¢ç¼–å·
+	char c_mkgsegment[20]; //å¯¹åº”çš„æŸä¸ªå¸‚åœºéƒ¨é—¨
+}customer;				   //é¡¾å®¢ç»“æ„ä½“ 
 
 typedef struct
 {
-	int o_orderkey;    	 //¶©µ¥ºÅ 
-	int o_custkey;    	 //¹Ë¿Í±àºÅ
-	char o_orderdate[10];//¶©»õÈÕÆÚ 
-}orders;				 //¶©µ¥
+	int o_orderkey;    	 //è®¢å•å· 
+	int o_custkey;    	 //é¡¾å®¢ç¼–å·
+	char o_orderdate[10];//è®¢è´§æ—¥æœŸ 
+}orders;				 //è®¢å•
 
 typedef struct
 {
-	int l_orderkey;//¶©µ¥ºÅ
-	double l_extendedprice;//¶îÍâ¼Û¸ñ
-	char l_shipdate[10];//·¢»õÈÕÆÚ 
-}lineitem; //ÉÌÆ·ĞÅÏ¢ 
+	int l_orderkey;//è®¢å•å·
+	double l_extendedprice;//é¢å¤–ä»·æ ¼
+	char l_shipdate[10];//å‘è´§æ—¥æœŸ 
+}lineitem; //å•†å“ä¿¡æ¯ 
 
 typedef struct
 {
-	int l_orderkey;//¶©µ¥ºÅ
-	char o_orderdate[10];//¶©»õÈÕÆÚ 
-	double l_extendedprice;//¶îÍâ¼Û¸ñ
+	int l_orderkey;//è®¢å•å·
+	char o_orderdate[10];//è®¢è´§æ—¥æœŸ 
+	double l_extendedprice;//é¢å¤–ä»·æ ¼
 }select_result;
 
 
-customer * read_customer_txt() //¶ÁÈ¡customer¡£txtÄÚÈİ 
+customer * read_customer_txt() //è¯»å–customerã€‚txtå†…å®¹ 
 {
 	int i=0;
 	char b;
@@ -54,7 +54,7 @@ customer * read_customer_txt() //¶ÁÈ¡customer¡£txtÄÚÈİ
 	fclose(fp);
 	return a;
 }
-orders * read_orders_txt()//¶ÁÈ¡orders.txtÄÚÈİ 
+orders * read_orders_txt()//è¯»å–orders.txtå†…å®¹ 
 {
 	char b,c;
 	long long d;
@@ -80,7 +80,7 @@ orders * read_orders_txt()//¶ÁÈ¡orders.txtÄÚÈİ
 	return a;
 }
 
-lineitem * read_lineitem_txt()//¶ÁÈ¡lineitem.txtÄÚÈİ
+lineitem * read_lineitem_txt()//è¯»å–lineitem.txtå†…å®¹
 {
 	int i=0;
 	char b,c;
@@ -104,14 +104,13 @@ lineitem * read_lineitem_txt()//¶ÁÈ¡lineitem.txtÄÚÈİ
 	return l; 
 }
 
-select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_date,char * ship_date,char * mktsegment)//½øĞĞÑ¡Ôñ 
+select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_date,char * ship_date,char * mktsegment)//è¿›è¡Œé€‰æ‹© 
 {	
 	int i,j,k;
 	int temp;
-	int index=0;
+	int idx=0;
 	select_result * a=NULL;
 	a = (select_result *)malloc(4001*sizeof(select_result));
-	//É¸Ñ¡ 
 	for(i=0;i<100;i++) 
 		if(strcmp(mktsegment,cus[i].c_mkgsegment)==0)
 			for(j=0;j<4000;j++)
@@ -119,33 +118,27 @@ select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_
 					for(k=0;k<1000;k++)
 						if(item[k].l_orderkey==ord[j].o_orderkey && strcmp(item[k].l_shipdate,ship_date)>0)
 						{
-							a[index].l_orderkey=item[k].l_orderkey;
-							a[index].l_extendedprice=item[k].l_extendedprice;
-							strcpy(a[index].o_orderdate, ord[j].o_orderdate);
-							index++;
+							a[idx].l_orderkey=item[k].l_orderkey;
+							a[idx].l_extendedprice=item[k].l_extendedprice;
+							strcpy(a[idx].o_orderdate, ord[j].o_orderdate);
+							idx++;
 						}
-	//ÇóºÍ 
-	index--;
-	for(i=0;i<index;i++)
-		for(j=0;j<index+1;j++)
+	idx--;
+	for(i=0;i<idx;i++)
+		for(j=0;j<idx+1;j++)
 			if(a[i].l_orderkey==a[j].l_orderkey)
 			{
 				a[i].l_extendedprice=a[i].l_extendedprice+a[j].l_extendedprice;
 				a[j].l_extendedprice=0;
 			}
-	//ÅÅĞò
-	for(i=0;i<index-1;i++)
-		for(j=i;j<index;j++)
+	for(i=0;i<idx-1;i++)
+		for(j=i;j<idx;j++)
 			if(a[j].l_extendedprice>a[i].l_extendedprice)
 			{
 				temp=a[i].l_extendedprice;
 				a[i].l_extendedprice=a[j].l_extendedprice;
 				a[j].l_extendedprice=temp;
 			}
-	//É¾³ı¶àÓàÏî
-	 /*for(i=0;i<index;i++)
-		if(a[i].l_extendedprice==0) 
-			free(a[i]);*/
 	
 	return a;
 }
@@ -153,11 +146,11 @@ select_result * Select(customer * cus,orders * ord,lineitem * item,char * order_
 	
 	
 
-//²¹³äÍêÉÆ£¡£¡£¡£¡£¡£¡£¡£¡£¡
+//è¡¥å……å®Œå–„ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼
 
 	
 
-int change_argv_to_number(char s[])//½«ÃüÁîĞĞÀï¶ÁÈëµÄÊı×Ö×Ö·û´®×ª»¯ÎªÕûĞÎÊı×Ö 
+int change_argv_to_number(char s[])//å°†å‘½ä»¤è¡Œé‡Œè¯»å…¥çš„æ•°å­—å­—ç¬¦ä¸²è½¬åŒ–ä¸ºæ•´å½¢æ•°å­— 
 {
 	int i=0;
 	int number=0;
@@ -173,7 +166,7 @@ int change_argv_to_number(char s[])//½«ÃüÁîĞĞÀï¶ÁÈëµÄÊı×Ö×Ö·û´®×ª»¯ÎªÕûĞÎÊı×Ö
 	return number;
 }
 
-int main(int argc,char * argv[])//argc±íÊ¾ÊäÈëÄÚÈİµÄ×Ü¸öÊı£¬argv[]ÄÚ±£´æ×ÅÊäÈëµÄÄÚÈİ 
+int main(int argc,char * argv[])//argcè¡¨ç¤ºè¾“å…¥å†…å®¹çš„æ€»ä¸ªæ•°ï¼Œargv[]å†…ä¿å­˜ç€è¾“å…¥çš„å†…å®¹ 
 {
 	int i,j;
 	int num;
@@ -184,20 +177,19 @@ int main(int argc,char * argv[])//argc±íÊ¾ÊäÈëÄÚÈİµÄ×Ü¸öÊı£¬argv[]ÄÚ±£´æ×ÅÊäÈëµÄ
 	char mktsegment[20];
 	printf("helle");
 	select_result *result=NULL;
-	customer * cus = NULL;//Ö¸Ïò¿Í»§±íµÄÖ¸Õë 
-	orders * ord = NULL;//Ö¸Ïò¶©µ¥±íµÄÖ¸Õë 
-	lineitem * item = NULL;//Ö¸Ïò ²úÆ·±íµÄÖ¸Õë 
-	cus = read_customer_txt();//¶ÁÈ¡customer.txtµÄÄÚÈİ £¬µ¼Èë¿Í»§±í 
-	ord = read_orders_txt();//¶ÁÈ¡orders.txtµÄÄÚÈİ £¬µ¼Èë¶©µ¥±í 
-	item = read_lineitem_txt();//¶ÁÈ¡lineitem.txtµÄÄÚÈİ £¬µ¼Èë²úÆ·±í 
-	num = change_argv_to_number(argv[4]);//×Ü¹²¼ÆËãµÄ´ÎÊı
+	customer * cus = NULL;//æŒ‡å‘å®¢æˆ·è¡¨çš„æŒ‡é’ˆ 
+	orders * ord = NULL;//æŒ‡å‘è®¢å•è¡¨çš„æŒ‡é’ˆ 
+	lineitem * item = NULL;//æŒ‡å‘ äº§å“è¡¨çš„æŒ‡é’ˆ 
+	cus = read_customer_txt();//è¯»å–customer.txtçš„å†…å®¹ ï¼Œå¯¼å…¥å®¢æˆ·è¡¨ 
+	ord = read_orders_txt();//è¯»å–orders.txtçš„å†…å®¹ ï¼Œå¯¼å…¥è®¢å•è¡¨ 
+	item = read_lineitem_txt();//è¯»å–lineitem.txtçš„å†…å®¹ ï¼Œå¯¼å…¥äº§å“è¡¨ 
+	num = change_argv_to_number(argv[4]);//æ€»å…±è®¡ç®—çš„æ¬¡æ•°
 	printf("helle");
 	for(i=0;num>0;num--,i=i+4)
 	{
 		strcpy(mktsegment,argv[5+i]);
 		strcpy(ship_date,argv[7+i]);
 		limit = change_argv_to_number(argv[8+i]);
-		//printf("%d	mktsegment:%s	order_date:%s	ship_date:%s	limit:%d\n",num,mktsegment,order_date,ship_date,limit);
 		strcpy(order_date,argv[6+i]);
 		result=Select(cus,ord,item,order_date,ship_date,mktsegment);
 		printf("l_orderkey|o_orderdate|revenue\n");
